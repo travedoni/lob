@@ -17,27 +17,30 @@ include_directories(${CMAKE_OSX_SYSROOT}/usr/include/c++/v1)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# ── Release flags for performance measurement (Phase 2) ──────────────────────
-# Switch to Release when benchmarking: cmake -DCMAKE_BUILD_TYPE=Release ..
 if(NOT CMAKE_BUILD_TYPE)
-  set(CMAKE_BUILD_TYPE Debug)
+  set(CMAKE_BUILD_TYPE Release)
 endif()
 
+# ── Compiler flags ────────────────────────────────────────────────────────────
 set(CMAKE_CXX_FLAGS_DEBUG   "-g -O0 -Wall -Wextra -Wpedantic")
 set(CMAKE_CXX_FLAGS_RELEASE "-O3 -DNDEBUG -march=native")
 
-# Phase 2: uncomment to enable AddressSanitizer for memory debugging
+# Uncomment for memory debugging:
 # set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fsanitize=address,undefined")
-# set(CMAKE_LINKER_FLAGS_DEBUG "-fsanitize=address,undefined")
 
 include_directories(include)
 
-# ── Main interactive CLI ──────────────────────────────────────────────────────
+# ── Phase 1: Interactive CLI ──────────────────────────────────────────────────
 add_executable(lob src/main.cpp)
 
-# ── Test suite ────────────────────────────────────────────────────────────────
+# ── Phase 1: Test suite ───────────────────────────────────────────────────────
 add_executable(test_lob tests/test_lob.cpp)
 
-# ── CTest integration ─────────────────────────────────────────────────────────
+# ── Phase 2: Benchmark ────────────────────────────────────────────────────────
+# Always built with -O3 for accurate perf numbers regardless of build type
+add_executable(benchmark src/benchmark.cpp)
+target_compile_options(benchmark PRIVATE -O3 -march=native -DNDEBUG)
+
+# ── CTest ─────────────────────────────────────────────────────────────────────
 enable_testing()
 add_test(NAME LOBTests COMMAND test_lob)
