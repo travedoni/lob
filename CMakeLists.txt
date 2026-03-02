@@ -41,6 +41,16 @@ add_executable(test_lob tests/test_lob.cpp)
 add_executable(benchmark src/benchmark.cpp)
 target_compile_options(benchmark PRIVATE -O3 -march=native -DNDEBUG)
 
+# ── Phase 3: Threaded engine benchmark ───────────────────────────────────────
+add_executable(threaded_benchmark src/threaded_benchmark.cpp)
+target_compile_options(threaded_benchmark PRIVATE -O3 -march=native -DNDEBUG)
+target_link_libraries(threaded_benchmark pthread)
+
+# ── Phase 3: Test suite ───────────────────────────────────────────────────────
+add_executable(test_thread_lob tests/test_thread_lob.cpp)
+target_link_libraries(test_thread_lob pthread)
+
 # ── CTest ─────────────────────────────────────────────────────────────────────
 enable_testing()
 add_test(NAME LOBTests COMMAND test_lob)
+add_test(NAME LOB2Tests COMMAND test_thread_lob)
